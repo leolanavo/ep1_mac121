@@ -24,7 +24,7 @@ int collatz(int i, int f)
         }
         vez++;
         x = i + vez;
-        /*printf("Número: %d Passos: %d\n", x-1, count);*/
+        /*printf("Número: %d Passos: %d\n", x-1, countp);*/
     }
     return 0;
 }
