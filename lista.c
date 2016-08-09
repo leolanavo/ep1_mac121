@@ -15,7 +15,6 @@ int main()
         {
             x = x/2;
         }
-        printf("Número: %d\n", x);
     }
     printf("Passos: %d\n", count);
     return 0;

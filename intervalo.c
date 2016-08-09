@@ -1,40 +1,40 @@
 #include <stdio.h>
-#include <time.h>
-    
-int collatz(int i, int f)
+
+unsigned short int steps[500000000];
+
+void collatz(int i, int f)
 {
-    int count, vez, n;
+    int count, index;
     int x = i;
-    vez = 0;
-    while (x <= f)
-    {    
+    for (index = 0; x <= f; index++, x = i + index)
+    {
         for (count = 0; x > 1; count++)
         {
-            if (x%2!=0)
+            if (x < 500000000 && steps[x] != 0)
             {
-                x = 3*x+1;
+                count = steps[x] + count - 1;
+                x = 1;
+            }
+            else if (x%2 != 0)
+            {
+                x = 3*x + 1;
             }
             else
             {
                 x = x/2;
             }
         }
-        vez++;
-        x = i + vez;
-        printf("Número: %d Passos: %d\n", x-1, count);
+        if (i + index < 500000000) steps[i + index]=count;
+        printf("%d", count);
     }
-    return 0;
 }
 
 
 int main()
 {
     int i, f;
-    printf("Digite o inicio e o fim do intervalo: ");
+    printf("Digite o início e o fim do intervalo: ");
     scanf("%d %d", &i, &f);
-    time_t start = clock(), dif;
-    int count = collatz(i, f);
-    dif = clock() - start;
-    printf("Time was: %d miliseconds\n", (dif*1000/CLOCKS_PER_SEC));
+    collatz(i, f);
     return 0;
 }
