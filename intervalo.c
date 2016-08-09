@@ -25,7 +25,7 @@ void collatz(int i, int f)
             }
         }
         if (i + index < 500000000) steps[i + index]=count;
-        printf("%d", count);
+        printf("%d\n", count);
     }
 }
 
