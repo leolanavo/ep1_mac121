@@ -1,40 +1,78 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-unsigned short int steps[500000000];
+typedef struct {
+    short int *data;
+    int *size;
+} Vector;
 
-void collatz(int i, int f)
-{
-    int count, index;
+Vector* newVector (int* size) {
+    int vector_size = *size;
+    Vector *new_vector;
+
+    new_vector = malloc(sizeof(Vector));
+
+    new_vector->size = &vector_size;
+    new_vector->data = calloc(*size, sizeof(*(new_vector->data)));
+    
+    return new_vector;
+}
+
+void deleteVector (Vector* V) {
+    free(V->data);
+    *(V->size) = 0;
+} 
+
+void Collatz (int i, int f) {
+    int count, index, section, max, *initial_size, *maxp;
+    Vector *steps;
     int x = i;
-    for (index = 0; x <= f; index++, x = i + index)
-    {
-        for (count = 0; x > 1; count++)
-        {
-            if (x < 500000000 && steps[x] != 0)
-            {
-                count = steps[x] + count - 1;
+
+    section = f - i;
+    initial_size = &section;
+    max = 300000000;
+    maxp = &max;
+
+    if (section <= max) {
+        steps = newVector(initial_size);
+    }
+    
+    else {
+        steps = newVector(maxp);
+    }
+
+    for (index = 0; x <= f; index++, x = i + index) {
+        for (count = 0; x > 1; count++) {
+
+            if (x < *(steps->size) && steps->data[x] != 0) {
+                count = steps->data[x] + count - 1;
                 x = 1;
             }
-            else if (x%2 != 0)
-            {
+
+            else if (x%2) {
                 x = 3*x + 1;
             }
-            else
-            {
+            
+            else {
                 x = x/2;
             }
+
         }
-        if (i + index < 500000000) steps[i + index]=count;
+
+        if (i + index < *(steps->size)) {
+            steps->data[i + index] = count;
+        }
+
         printf("%d\n", count);
     }
+    deleteVector(steps);
 }
 
 
-int main()
-{
+int main () {
     int i, f;
     printf("Digite o início e o fim do intervalo: ");
     scanf("%d %d", &i, &f);
-    collatz(i, f);
+    Collatz(i, f);
     return 0;
 }
