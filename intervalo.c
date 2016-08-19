@@ -1,71 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct {
-    short int *data;
-    int *size;
-} Vector;
-
-Vector* newVector (int* size) {
-    int vector_size = *size;
-    Vector *new_vector;
-
-    new_vector = malloc(sizeof(Vector));
-
-    new_vector->size = &vector_size;
-    new_vector->data = calloc(*size, sizeof(*(new_vector->data)));
-    
-    return new_vector;
-}
-
-void deleteVector (Vector* V) {
-    free(V->data);
-    *(V->size) = 0;
-} 
-
 void Collatz (int i, int f) {
-    int count, index, section, max, *initial_size, *maxp;
-    Vector *steps;
-    int x = i;
+    int count, index, size, section; 
+    unsigned short int *steps; 
+    long int aux = i;
 
-    section = f - i;
-    initial_size = &section;
-    max = 300000000;
-    maxp = &max;
+    /*O vetor é declarado como unsigned short int, porque o número de
+    passos não será maior que 2^16-1.
+    Declara a variável aux como long int para garantir que
+    durante os cálculos da conjectura, caso o número ultrapasse
+    2^31-1, não haja problemas.*/
 
-    if (section <= max) {
-        steps = newVector(initial_size);
+    section = (f - i)*5;
+
+    if (section <= 250000000) {                            
+        size = section;         
     }
-    
-    else {
-        steps = newVector(maxp);
+
+    else { 
+        size = 250000000;
     }
 
-    for (index = 0; x <= f; index++, x = i + index) {
-        for (count = 0; x > 1; count++) {
+    /*O tamanho máximo do vetor é 250*10⁶ de short int's
+    para o programa não alocar mais de 500mb de memória*/
 
-            if (x < *(steps->size) && steps->data[x] != 0) {
-                count = steps->data[x] + count - 1;
-                x = 1;
+    steps = calloc(size, sizeof(short int));
+
+    /*Usa-se a função calloc para garantir que
+    o vetor alocado seja preenchido com 0's*/
+
+    for (index = 0; aux <= f; index++, aux = i + index) {
+        for (count = 0; aux > 1; count++) {
+
+            if (aux < size && steps[aux] != 0) {
+                count = steps[aux] + count - 1;
+                aux = 1;
             }
 
-            else if (x%2) {
-                x = 3*x + 1;
+            /*Caso a posição de certo número dentro do vetor não seja nula
+            o count absorverá esse valor, pois este valor é o número 
+            de passos de um número previamente calculado. O -1 garante que
+            não há passos sendo contado duas vezes. 
+            Ex: num intervalo de 26 a 58, o 27 ocupa a segunda posição
+            quando a função for calcular o 54, a função irá somar o que há
+            na segunda posição do vetor com o valor de count. 000000*/
+
+            else if (aux%2) {
+                aux = (3*aux + 1)>>1;
+                count++;
             }
             
             else {
-                x = x/2;
+                aux = aux>>1;
+
             }
-
+            
+            /*Caso a posição no vetor seja nula, a função irá calcular o valor
+            para a próxima interação*/
         }
 
-        if (i + index < *(steps->size)) {
-            steps->data[i + index] = count;
+        if (i + index <= size) {
+            steps[i + index] = count;
         }
 
-        printf("%d\n", count);
+
+        /*printf("%u\n", count);*/
     }
-    deleteVector(steps);
+    free(steps);
+    steps = NULL;
 }
 
 
